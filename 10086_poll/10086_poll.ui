@@ -105,6 +105,20 @@
       </widget>
      </item>
      <item>
+      <widget class="QRadioButton" name="radioButton">
+       <property name="text">
+        <string>RadioButton</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioButton_2">
+       <property name="text">
+        <string>new</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>

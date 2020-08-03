@@ -14,6 +14,7 @@ import time
 import json
 import urllib3
 import _thread
+from evaluateResult import evaluateResult
 
 urllib3.disable_warnings()
 
@@ -47,7 +48,7 @@ class Poll:
             s.proxies = self.proxies
         self.s = s
 
-    def submit_poll(self, url):
+    def submit_poll(self, url, poll_type):
         r = self.s.get(url, verify=False)
         if '重复提交' in r.text:
             return '%s 链接已提交,请勿重复提交' % url
@@ -59,56 +60,111 @@ class Poll:
             args = self.get_url_args(jump302_url)
         else:
             return '%s 无效链接' % url
+
+        new_score_data = [
+            {
+                "score": 10,
+                "questionId": "2019112612330061201052001",
+                "questionTitle": "装机整体满意度",
+                "answerOrder": 1,
+                "surveyObjType": "0",
+                "suggestion": "",
+                "surveyLables": ""
+            },
+            {
+                "score": 10,
+                "questionId": "2020011919364267101052001",
+                "questionTitle": "上门及时性",
+                "answerOrder": 2,
+                "surveyObjType": "0",
+                "suggestion": "",
+                "surveyLables": "上门快,上门准时,提前预约时间"
+            },
+            {
+                "score": 10,
+                "questionId": "2019112614320298901052001",
+                "questionTitle": "安装专业性",
+                "answerOrder": 3,
+                "surveyObjType": "0",
+                "suggestion": "",
+                "surveyLables": "装机快,布线美观,现场干净整洁"
+            },
+            {
+                "score": 10,
+                "questionId": "2019112614355544701052001",
+                "questionTitle": "安装人员服务",
+                "answerOrder": 4,
+                "surveyObjType": "0",
+                "suggestion": "",
+                "surveyLables": "服务态度好,答疑指导耐心,工装整洁大方"
+            },
+            {
+                "score": "",
+                "questionId": "2019112614363640001053001",
+                "questionTitle": "装机完成后是否测速",
+                "suggestion": "",
+                "surveyLables": "是",
+                "surveyObjType": "0",
+                "answerOrder": 5
+            }
+        ]
+
+        trouble_score_data = [
+            {
+                "score": 10,
+                "questionId": "2019112714221718701051001",
+                "questionTitle": "故障维修整体满意度",
+                "answerOrder": 1,
+                "surveyObjType": "0",
+                "suggestion": "",
+                "surveyLables": ""
+            },
+            {
+                "score": 10,
+                "questionId": "2019112714472810201052001",
+                "questionTitle": "上门及时性",
+                "answerOrder": 2,
+                "surveyObjType": "0",
+                "suggestion": "",
+                "surveyLables": "上门快,上门准时,有提前预约时间"
+            },
+            {
+                "score": 10,
+                "questionId": "2019112714481805801051001",
+                "questionTitle": "故障解决专业性",
+                "answerOrder": 3,
+                "surveyObjType": "0",
+                "suggestion": "",
+                "surveyLables": "故障解决快,现场干净整洁"
+            },
+            {
+                "score": 10,
+                "questionId": "2019112714504311401052001",
+                "questionTitle": "维修人员服务",
+                "answerOrder": 4,
+                "surveyObjType": "0",
+                "suggestion": "",
+                "surveyLables": "服务态度好,答疑指导耐心,工装整洁大方"
+            },
+            {
+                "score": "",
+                "questionId": "2019112714514659501053001",
+                "questionTitle": "维修完成后是否测速",
+                "suggestion": "",
+                "surveyLables": "是",
+                "surveyObjType": "0",
+                "answerOrder": 5
+            }
+        ]
+
         score_data = {
             "qnrSuggestion": "",
-            "questionList": [
-                {
-                    "score": 10,
-                    "questionId": "2019112714221718701051001",
-                    "questionTitle": u"故障维修整体满意度",
-                    "answerOrder": 1,
-                    "surveyObjType": "0",
-                    "suggestion": "",
-                    "surveyLables": ""
-                },
-                {
-                    "score": 10,
-                    "questionId": "2019112714472810201052001",
-                    "questionTitle": u"上门及时性",
-                    "answerOrder": 2,
-                    "surveyObjType": "0",
-                    "suggestion": "",
-                    "surveyLables": u"上门快,上门准时,有提前预约时间"
-                },
-                {
-                    "score": 10,
-                    "questionId": "2019112714481805801051001",
-                    "questionTitle": u"故障解决专业性",
-                    "answerOrder": 3,
-                    "surveyObjType": "0",
-                    "suggestion": "",
-                    "surveyLables": u"故障解决快,现场干净整洁"
-                },
-                {
-                    "score": 10,
-                    "questionId": "2019112714504311401052001",
-                    "questionTitle": u"维修人员服务",
-                    "answerOrder": 4,
-                    "surveyObjType": "0",
-                    "suggestion": "",
-                    "surveyLables": u"服务态度好,答疑指导耐心,工装整洁大方"
-                },
-                {
-                    "score": "",
-                    "questionId": "2019112714514659501053001",
-                    "questionTitle": u"维修完成后是否测速",
-                    "suggestion": "",
-                    "surveyLables": u"是",
-                    "surveyObjType": "0",
-                    "answerOrder": 5
-                }
-            ]
+            "questionList": new_score_data if poll_type else trouble_score_data
         }
+        # print(score_data)
+        # 0新装　１故障
+        eva_result = evaluateResult[0] if poll_type else evaluateResult[1]
+        eva_result['qnrId'] = args['questionnaireId']
         post_data = {
             "questionList": json.dumps(score_data, ensure_ascii=False),
             "serNum": '',
@@ -120,12 +176,13 @@ class Poll:
             'qnrId': args['questionnaireId'],
             'h5PageUrlWeb': 'https://eva.customer.10086.cn/surv/QnrTomatoOrange.html?questionnaireId=%s' % args[
                 'questionnaireId'],
-            'token': args['token']
+            'token': args['token'],
+            'evaluateResult': eva_result
         }
 
         self.req_headers['Referer'] = jump302_url
         self.s.headers.update(self.req_headers)
-
+        # print(json.dumps(post_data, ensure_ascii=False))
         r = self.s.post(
             'https://eva.customer.10086.cn/surveyH5Response/dynamicQuestion',
             data=post_data,
@@ -212,6 +269,16 @@ class Ui_Form(QtWidgets.QWidget):
         self.label_2 = QtWidgets.QLabel(self)
         self.label_2.setObjectName("label_2")
         self.horizontalLayout_4.addWidget(self.label_2)
+
+        # self.rb_new = QtWidgets.QRadioButton(self)
+        # self.rb_new.setObjectName(u"rb_new")
+        # self.rb_new.setChecked(True)
+        # self.horizontalLayout_4.addWidget(self.rb_new)
+        #
+        # self.rb_trouble = QtWidgets.QRadioButton(self)
+        # self.rb_trouble.setObjectName(u"rb_trouble")
+        # self.horizontalLayout_4.addWidget(self.rb_trouble)
+
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_4.addItem(spacerItem)
         self.verticalLayout_3.addLayout(self.horizontalLayout_4)
@@ -220,7 +287,6 @@ class Ui_Form(QtWidgets.QWidget):
 
         self.sig = Communicate()
         self.sig.signal.connect(self.update_log)
-
 
         self.msgBox = QtWidgets.QMessageBox()
         self.btn_ok.clicked.connect(self.btn_start_click_event)
@@ -237,7 +303,9 @@ class Ui_Form(QtWidgets.QWidget):
         self.btn_ok.setText(_translate("Form", "开始"))
         self.btn_stop.setText(_translate("Form", "停止"))
         self.label.setText(_translate("Form", u"       延后"))
-        self.label_2.setText(_translate("Form", "分钟"))
+        self.label_2.setText(_translate("Form", "小时"))
+        # self.rb_new.setText(_translate("Form", "新装"))
+        # self.rb_trouble.setText(_translate("Form", "故障"))
 
     def update_log(self, val):
         self.progressBar.setValue(int(val[0] * 100))
@@ -268,9 +336,10 @@ class Ui_Form(QtWidgets.QWidget):
         self.txbLogs.setPlainText('开始执行...')
         text = text.replace('	', '|')
         text = re.sub(' +', ' ', text)
-        _thread.start_new_thread(self.poll_start, (text,))
+        # is_new_poll = self.rb_new.isChecked()
+        _thread.start_new_thread(self.poll_start, (text, True))
 
-    def poll_start(self, text):
+    def poll_start(self, text, poll_type):
         # print(lines)
         self.running = True
         pre_time = self.spinBox.value()
@@ -309,10 +378,10 @@ class Ui_Form(QtWidgets.QWidget):
                     self.txbList.setReadOnly(False)
                     exit()
 
-                is_start = user_date + pre_time * 60
+                is_start = user_date + pre_time * 60 * 60
                 print(is_start, now, now - is_start)
                 if (is_start == now + 1 or is_start == now - 1) and line not in success_list:
-                    resp_text = poll.submit_poll(x[1])
+                    resp_text = poll.submit_poll(x[1], poll_type)
                     # self.txbLogs.appendPlainText(resp_text)
                     success_list.append(line)
                     progress_percent = len(success_list) / len(data)

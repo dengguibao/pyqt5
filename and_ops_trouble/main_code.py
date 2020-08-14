@@ -15,6 +15,8 @@ class Main:
 
         self.import_window = ImportAccountDialog()
 
+        QtWidgets.QMessageBox.warning(self.form,'aaa','bbbbb',QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
+
     def show(self):
         self.form.show()
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '10086_poll.ui'
+# Form implementation generated from reading ui file 'main_ui.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.2
 #

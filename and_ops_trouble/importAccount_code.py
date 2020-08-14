@@ -11,6 +11,7 @@ class ImportAccountDialog:
         self.ui = Ui_import()
         self.ui.setupUi(self.form)
         self.account_list = []
+        self.form.setFixedSize(self.form.width(),self.form.height())
         self.init_button_event()
 
     def show(self):

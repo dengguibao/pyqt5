@@ -1,6 +1,5 @@
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 import re
 import time
 import _thread
@@ -130,8 +129,10 @@ class Main():
                         x.append(a[-1])
                         x.append(a[-2])
                         self.write_log(', '.join(x))
-                    self.sig.signal.emit([progress_percent, resp_text])
-            self.log_close()
+                        self.sig.signal.emit([progress_percent, ', '.join(x)])
+                    else:
+                        self.sig.signal.emit([progress_percent, resp_text])
+        self.log_close()
 
 
 if __name__ == '__main__':

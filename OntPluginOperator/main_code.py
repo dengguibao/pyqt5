@@ -68,11 +68,11 @@ class Worker(QtCore.QThread):
                             'pluginName': i['Plugin_Name'],
                             'pluginVersion': i['Version']
                         }
+                        args['pluginVersion'] = '2.2.2' if args['pluginName'] == 'com.chinamobile.smartgateway.cmccdpi' else args['pluginVersion']
+
                         plugin_info = self.api.check_plugin_exist(args)
                         if plugin_info['result'] == 1 and plugin_info['vars']['pluginId'] > 0:
                             args['pluginId'] = plugin_info['vars']['pluginId']
-                            args['pluginVersion'] = '2.2.2' if args['pluginName'] == 'com.chinamobile.smartgateway.cmccdpi' else args['pluginVersion']
-
                             uninstall_info = self.api.plugin_uninstall(args)
                             self.signal.emit(
                                 'SN: %s , action:uninstall_plugin, device_id:%s, dev_mac:%s, plugin_id:%s, uninstall_plugin:%s, plugin_version:%s, return_message:%s' % (

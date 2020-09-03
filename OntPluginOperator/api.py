@@ -174,11 +174,11 @@ class Api:
         else:
             return
 
-    def plugin_uninstall(self, args):
+    def plugin_opt(self, args, url_arg):
         if not args or not self.__token:
             return
 
-        post_url = '%s/dhmp/equipmentOperation/pluginUnInstall' % self.url
+        post_url = '%s/dhmp/equipmentOperation/plugin%s' % (self.url, url_arg)
 
         post_data = {
             "devId": args['devId'],
@@ -200,3 +200,9 @@ class Api:
             return res.json()
         else:
             return
+
+    def plugin_uninstall(self, args):
+        return self.plugin_opt(args, 'UnInstall')
+
+    def plugin_install(self, args):
+        return self.plugin_opt(args, 'Install')

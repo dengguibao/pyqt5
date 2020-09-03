@@ -7,22 +7,21 @@ import os
 
 
 class Worker(QtCore.QThread):
-
     signal = QtCore.pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
         self.api = None
         self.sn_list = None
-        self.only_query = False
-        self.uninstall_list = []
+        self.action_plugin_list = None
+        self.action = None
         self.stopAndExit = False
 
-    def set_env_var(self, api, sn_data, uninstall_list, only_query=False):
+    def set_env_var(self, api, sn_data, action_plugin_list, action):
         self.api = api
         self.sn_list = sn_data
-        self.only_query = only_query
-        self.uninstall_list = uninstall_list
+        self.action_plugin_list = action_plugin_list
+        self.action = action
 
     def run(self):
         if not self.sn_list:
@@ -49,44 +48,90 @@ class Worker(QtCore.QThread):
                 self.signal.emit('SN: %s , message:not found MAC address about that ONT device' % sn)
 
             if not plugin_list or 'Plugin' not in plugin_list:
+                self.signal.emit('SN: %s , message:not found any plugin in this ONT device' % sn)
                 continue
 
             if plugin_list and len(plugin_list['Plugin']) == 0:
                 self.signal.emit('SN:%s , message:not found any plugin about this ont' % sn)
                 continue
 
-            for i in plugin_list['Plugin']:
-                self.signal.emit(
-                    ('SN: %s , plugin_name:{Plugin_Name}, version:{Version}, running:{Run}' % sn).format(**i)
-                )
-                if not self.only_query:
-                    if i['Plugin_Name'] in self.uninstall_list:
-                        args = {
-                            'devId': dev_id,
-                            'mac': dev_mac,
-                            'sn': sn,
-                            'pluginName': i['Plugin_Name'],
-                            'pluginVersion': i['Version']
-                        }
-                        args['pluginVersion'] = '2.2.2' if args['pluginName'] == 'com.chinamobile.smartgateway.cmccdpi' else args['pluginVersion']
+            plugin_action_msg = 'SN: %s , action:%s_plugin, device_id:%s, dev_mac:%s, plugin_id:%s, uninstall_plugin:%s, plugin_version:%s, return_message:%s'
+
+            args = {
+                'devId': dev_id,
+                'mac': dev_mac,
+                'sn': sn,
+                'pluginName': '',
+                'pluginVersion': '',
+                'pluginId': ''
+            }
+
+            if self.action == 'install':
+                for install_plugin in self.action_plugin_list:
+                    if '==' in install_plugin:
+                        x = install_plugin.split('==')
+                        args['pluginName'] = x[0].strip()
+                        args['pluginVersion'] = x[1].strip()
+                    else:
+                        args['pluginVersion'] = '2.2.2' if install_plugin == 'com.chinamobile.smartgateway.cmccdpi' else ''
+                        args['pluginName'] = install_plugin
+
+                    plugin_info = self.api.check_plugin_exist(args)
+                    if plugin_info['result'] == 1 and plugin_info['vars']['pluginId'] > 0:
+                        args['pluginId'] = plugin_info['vars']['pluginId']
+                    else:
+                        self.signal.emit('SN: %s, plugin_name:%s, not found plugin ID' % (sn, args['pluginName']))
+                        continue
+
+                    install_info = self.api.plugin_install(args)
+                    self.signal.emit(
+                        plugin_action_msg % (
+                            sn,
+                            self.action,
+                            args['devId'],
+                            args['mac'],
+                            args['pluginId'],
+                            args['pluginName'],
+                            args['pluginVersion'],
+                            install_info['message']
+                        )
+                    )
+
+            if self.action == 'remove':
+                for i in plugin_list['Plugin']:
+                    # self.signal.emit(
+                    #     ('SN: %s , plugin_name:{Plugin_Name}, version:{Version}, running:{Run}' % sn).format(**i)
+                    # )
+                    if i['Plugin_Name'] in self.action_plugin_list:
+                        args['pluginVersion'] = '2.2.2' if i['Plugin_Name'] == 'com.chinamobile.smartgateway.cmccdpi' else i['Version']
+                        args['pluginName'] = i['Plugin_Name']
 
                         plugin_info = self.api.check_plugin_exist(args)
                         if plugin_info['result'] == 1 and plugin_info['vars']['pluginId'] > 0:
                             args['pluginId'] = plugin_info['vars']['pluginId']
-                            uninstall_info = self.api.plugin_uninstall(args)
-                            self.signal.emit(
-                                'SN: %s , action:uninstall_plugin, device_id:%s, dev_mac:%s, plugin_id:%s, uninstall_plugin:%s, plugin_version:%s, return_message:%s' % (
-                                    sn,
-                                    args['devId'],
-                                    args['mac'],
-                                    args['pluginId'],
-                                    args['pluginName'],
-                                    args['pluginVersion'],
-                                    uninstall_info['message']
-                                )
+                        else:
+                            self.signal.emit('SN: %s, plugin_name:%s, not found plugin ID' % (sn, i['Plugin_Name']))
+                            continue
+
+                        uninstall_info = self.api.plugin_uninstall(args)
+                        self.signal.emit(
+                            plugin_action_msg % (
+                                sn,
+                                self.action,
+                                args['devId'],
+                                args['mac'],
+                                args['pluginId'],
+                                args['pluginName'],
+                                args['pluginVersion'],
+                                uninstall_info['message']
                             )
-            if self.only_query:
-                self.signal.emit('split_lines')
+                        )
+
+            if self.action == 'query':
+                for i in plugin_list['Plugin']:
+                    self.signal.emit(
+                        ('SN: %s , plugin_name:{Plugin_Name}, version:{Version}, running:{Run}' % sn).format(**i)
+                    )
 
         self.stopAndExit = True
         self.signal.emit('update_front_ui')
@@ -128,15 +173,22 @@ class Main:
     def init_button_event(self):
         btn_text = self.form.sender().text()
 
-        uninstall_txt = self.ui.txbUninstall_list.text().strip()
-        uninstall_list = [] if uninstall_txt == '' else uninstall_txt.split(',')
+        action_plugin_text = self.ui.txbUninstall_list.text().strip()
+        action_plugin_list = [] if action_plugin_text == '' else action_plugin_text.split(',')
+        if self.ui.rbInstall.isChecked():
+            action = 'install'
+        elif self.ui.rbUninstall.isChecked():
+            action = 'remove'
+        else:
+            action = 'query'
 
         if btn_text == 'Start' and not self.worker.isRunning():
             sn_list = self.get_sn_list_from_file()
             if sn_list:
                 self.empty_logs()
                 self.ui.txbLogs.appendPlainText('从文件共读取%s个SN码' % len(sn_list))
-                self.worker.set_env_var(self.api, sn_list, uninstall_list)
+                # print(action_plugin_list, action)
+                self.worker.set_env_var(self.api, sn_list, action_plugin_list, action)
                 self.worker.start()
                 self.worker.stopAndExit = False
                 self.update_sys_state()
@@ -148,12 +200,12 @@ class Main:
             self.worker.stopAndExit = True
             self.update_sys_state()
 
-        if btn_text == 'Query' and not self.worker.isRunning():
+        if btn_text == 'Submit' and not self.worker.isRunning():
             sn = self.ui.txbSn.text().strip()
             print(sn)
             if sn:
                 self.empty_logs()
-                self.worker.set_env_var(self.api, [sn], uninstall_list, True)
+                self.worker.set_env_var(self.api, [sn], action_plugin_list, action)
                 self.worker.start()
                 self.worker.stopAndExit = False
 
@@ -214,7 +266,8 @@ class Main:
     def user_login(self):
         try:
             login_state = self.api.user_login()
-        except:
+        except Exception as e:
+            print(e)
             self.ui.txbLogs.appendPlainText('网络链接失败')
             return
 

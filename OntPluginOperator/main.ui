@@ -60,12 +60,36 @@
         <item>
          <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>Uninstall list</string>
+           <string>Plugin List</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QLineEdit" name="txbUninstall_list"/>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="rbInstall">
+          <property name="text">
+           <string>Install</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="rbUninstall">
+          <property name="text">
+           <string>Remove</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="rbQuery">
+          <property name="text">
+           <string>Query</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -89,7 +113,10 @@
         <item>
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>             SN</string>
+           <string>SN</string>
+          </property>
+          <property name="indent">
+           <number>42</number>
           </property>
          </widget>
         </item>
@@ -109,7 +136,7 @@
         <item>
          <widget class="QPushButton" name="btnQuery">
           <property name="text">
-           <string>Query</string>
+           <string>Submit</string>
           </property>
          </widget>
         </item>

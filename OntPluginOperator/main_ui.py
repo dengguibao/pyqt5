@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.2
+# Created by: PyQt5 UI code generator 5.14.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -52,6 +52,16 @@ class Ui_Form(object):
         self.txbUninstall_list = QtWidgets.QLineEdit(self.groupBox_3)
         self.txbUninstall_list.setObjectName("txbUninstall_list")
         self.horizontalLayout_3.addWidget(self.txbUninstall_list)
+        self.rbInstall = QtWidgets.QRadioButton(self.groupBox_3)
+        self.rbInstall.setObjectName("rbInstall")
+        self.horizontalLayout_3.addWidget(self.rbInstall)
+        self.rbUninstall = QtWidgets.QRadioButton(self.groupBox_3)
+        self.rbUninstall.setObjectName("rbUninstall")
+        self.horizontalLayout_3.addWidget(self.rbUninstall)
+        self.rbQuery = QtWidgets.QRadioButton(self.groupBox_3)
+        self.rbQuery.setChecked(True)
+        self.rbQuery.setObjectName("rbQuery")
+        self.horizontalLayout_3.addWidget(self.rbQuery)
         self.verticalLayout_6.addWidget(self.groupBox_3)
         self.verticalLayout_3.addLayout(self.verticalLayout_6)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
@@ -66,6 +76,7 @@ class Ui_Form(object):
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.groupBox_2)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.label = QtWidgets.QLabel(self.groupBox_2)
+        self.label.setIndent(42)
         self.label.setObjectName("label")
         self.horizontalLayout_2.addWidget(self.label)
         self.txbSn = QtWidgets.QLineEdit(self.groupBox_2)
@@ -98,8 +109,11 @@ class Ui_Form(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
         self.groupBox.setTitle(_translate("Form", "Logs"))
-        self.label_2.setText(_translate("Form", "Uninstall list"))
-        self.label.setText(_translate("Form", "             SN"))
-        self.btnQuery.setText(_translate("Form", "Query"))
+        self.label_2.setText(_translate("Form", "Plugin List"))
+        self.rbInstall.setText(_translate("Form", "Install"))
+        self.rbUninstall.setText(_translate("Form", "Remove"))
+        self.rbQuery.setText(_translate("Form", "Query"))
+        self.label.setText(_translate("Form", "SN"))
+        self.btnQuery.setText(_translate("Form", "Submit"))
         self.btnStart.setText(_translate("Form", "Start"))
         self.btnStop.setText(_translate("Form", "Stop"))

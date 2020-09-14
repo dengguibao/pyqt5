@@ -11,7 +11,7 @@ class Communicate(QtCore.QObject):
     signal = QtCore.pyqtSignal(list)
 
 
-class Main():
+class Main:
     running = False
     log_fo = None
 

@@ -125,9 +125,7 @@ class Main:
                     success_list.append(line)
                     progress_percent = len(success_list) / len(data)
                     if 'success' in resp_text:
-                        a = resp_text.split(', ')
-                        x.append(a[-1])
-                        x.append(a[-2])
+                        [x.append(i) for i in resp_text.split(', ') if 'url:' not in i]
                         self.write_log(', '.join(x))
                         self.sig.signal.emit([progress_percent, ', '.join(x)])
                     else:

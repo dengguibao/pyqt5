@@ -11,7 +11,7 @@ class Poll:
         # 'https': 'http://172.31.10.84:2345'
     }
 
-    domain = "'https://eva.customer.10086.cn'"
+    domain = "https://eva.customer.10086.cn"
 
     req_headers = {
         'Accept-Encoding': 'gzip, deflate',
@@ -100,23 +100,22 @@ class Poll:
                     "questionList": d['data']['score']
                 }, ensure_ascii=False
             ),
+            'token': d['url_args']['token'],
             "serNum": '',
             "channelId": '',
             "serType": '',
             "prvo": '',
-            "servalue": '',
-            "detailsUrl": '/survey/detailsofTomatoOrange.html?taskSheetId=',
             'qnrId': d['url_args']['questionnaireId'],
             'h5PageUrlWeb': '%s/surv/QnrTomatoOrange.html?questionnaireId=%s' % (self.domain, d['url_args']['questionnaireId']),
-            'token': d['url_args']['token'],
-            'evaluateResult': json.dumps(d['data']['eva'], ensure_ascii=False)
+            "servalue": '',
+            'evaluateResult': d['data']['eva'],
+            "detailsUrl": '/survey/detailsofTomatoOrange.html?taskSheetId=',
         }
 
         # print(post_data)
-        # return 'aaaa'
         self.req_headers['Referer'] = jump302_url
         # requests lib default header
-        # self.req_headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
+        self.req_headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
         r = self.post_req(post_data)
 
         tmp_str = 'url:%s, order_type:%s, version:%s' % (url, d['order_desc'], d['version'])
@@ -140,7 +139,8 @@ class Poll:
 
     def post_req(self, post_data):
         self.s.headers.update(self.req_headers)
-        url = 'https://eva.customer.10086.cn/surveyH5Response/dynamicQuestion'
+        url = '%s/surveyH5Response/dynamicQuestion' % self.domain
+
         return self.s.post(
             url,
             data=post_data,

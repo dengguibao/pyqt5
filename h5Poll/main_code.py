@@ -1,10 +1,10 @@
 import sys
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 import re
 import time
 import _thread
 from api import Poll
-from main_ui import Ui_Form
+from expendApprove.main_ui import Ui_Form
 
 
 class Communicate(QtCore.QObject):

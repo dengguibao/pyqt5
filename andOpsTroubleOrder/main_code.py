@@ -1,6 +1,6 @@
-from main import Ui_Form as Ui_Main
+from expendApprove.main import Ui_Form as Ui_Main
 from importAccount_code import ImportAccountDialog
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5 import QtWidgets
 import sys
 
 

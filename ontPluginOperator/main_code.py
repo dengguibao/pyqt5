@@ -1,5 +1,5 @@
 from api import Api
-from main_ui import Ui_Form
+from expendApprove.main_ui import Ui_Form
 from PyQt5 import QtWidgets, QtCore
 import sys
 import time

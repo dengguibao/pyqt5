@@ -4,7 +4,7 @@ from and_task_list_ui_code import TaskListDialog
 from and_help_ui_code import HelpDialog
 
 from and_krkj_api import Api
-from excel_reader import ExcelReader
+from expendApprove.excel_reader import ExcelReader
 from PyQt5 import QtWidgets, QtCore, QtGui
 import _thread
 import time

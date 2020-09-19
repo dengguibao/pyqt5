@@ -1,4 +1,4 @@
-import json
+# import json
 import urllib3
 import requests
 from evaluateResult import evaluateResult
@@ -16,14 +16,13 @@ class Poll:
     req_headers = {
         'Accept-Encoding': 'gzip, deflate',
         'Accept': 'application/json, text/javascript, */*; q=0.01,',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         'Connection': 'Keep-Alive',
         'Host': 'eva.customer.10086.cn',
         'Origin': domain,
         'Sec-Fetch-Mode': 'cors',
         'Sec-Fetch-Site': 'same-origin',
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) \
-            AppleWebKit/537.36 (KHTML, like Gecko) \
-            Chrome/79.0.3945.130 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0',
         'X-Requested-With': 'XMLHttpRequest'
     }
     s = None
@@ -94,12 +93,7 @@ class Poll:
             return d
 
         post_data = {
-            "questionList": json.dumps(
-                {
-                    "qnrSuggestion": "",
-                    "questionList": d['data']['score']
-                }, ensure_ascii=False
-            ),
+            "questionList": d['data']['score'],
             'token': d['url_args']['token'],
             "serNum": '',
             "channelId": '',
@@ -112,10 +106,10 @@ class Poll:
             "detailsUrl": '/survey/detailsofTomatoOrange.html?taskSheetId=',
         }
 
+
         # print(post_data)
         self.req_headers['Referer'] = jump302_url
         # requests lib default header
-        self.req_headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
         r = self.post_req(post_data)
 
         tmp_str = 'url:%s, order_type:%s, version:%s' % (url, d['order_desc'], d['version'])
@@ -139,7 +133,8 @@ class Poll:
 
     def post_req(self, post_data):
         self.s.headers.update(self.req_headers)
-        url = '%s/surveyH5Response/dynamicQuestion' % self.domain
+        # url = '%s/surveyH5Response/dynamicQuestion' % self.domain
+        url = 'http://127.0.0.1:8080/test'
 
         return self.s.post(
             url,

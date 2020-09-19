@@ -1,5 +1,5 @@
-from expendApprove.main_ui import Ui_Form
-from expendApprove.cmcc_sp_api import Api, ReadConfig
+from main_ui import Ui_Form
+from cmcc_sp_api import Api, ReadConfig
 from expendApprove.excel_reader import ExcelReader
 from PyQt5 import QtWidgets, QtCore, QtGui
 import _thread

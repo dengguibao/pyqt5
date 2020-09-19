@@ -1,4 +1,3 @@
-# import json
 import urllib3
 import requests
 from evaluateResult import evaluateResult
@@ -133,8 +132,8 @@ class Poll:
 
     def post_req(self, post_data):
         self.s.headers.update(self.req_headers)
-        # url = '%s/surveyH5Response/dynamicQuestion' % self.domain
-        url = 'http://127.0.0.1:8080/test'
+        url = '%s/surveyH5Response/dynamicQuestion' % self.domain
+        # url = 'http://127.0.0.1:8080/test'
 
         return self.s.post(
             url,
